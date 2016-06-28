@@ -1,0 +1,33 @@
+{
+    "name": "nailsapp/module-calendar",
+    "keywords": ["Nails", "Shed Collective", "CodeIgniter", "Calendar Module"],
+    "homepage": "http://nailsapp.co.uk/modules/calendar",
+    "description": "This is the calendar module for Nails. It provides basic calendar functionality.",
+    "license": "MIT",
+    "authors":
+    [
+        {
+            "name": "Pablo de la Pena",
+            "email": "p@nailsapp.co.uk",
+            "homepage": "http://nailsapp.co.uk",
+            "role": "Developer"
+        }
+    ],
+    "support":
+    {
+        "email": "hello@nailsapp.co.uk"
+    },
+    "extra":
+    {
+        "nails" :
+        {
+            "moduleName": "calendar",
+            "type": "module",
+            "namespace": "Nails\\Calendar\\"
+        }
+    },
+    "autoload":
+    {
+        "psr-4": {"Nails\\Calendar\\": "src/"}
+    }
+}

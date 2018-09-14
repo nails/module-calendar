@@ -1,5 +1,5 @@
 {
-    "name": "nailsapp/module-calendar",
+    "name": "nails/module-calendar",
     "keywords": ["Nails", "Shed Collective", "CodeIgniter", "Calendar Module"],
     "homepage": "http://nailsapp.co.uk/modules/calendar",
     "description": "This is the calendar module for Nails. It provides basic calendar functionality.",

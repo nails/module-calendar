@@ -235,21 +235,20 @@ class Ics implements \JsonSerializable {
         //  Generate the file
         $sData = $this->getData();
 
-        $oOutput = Factory::servicesave('Output');
-
         //  Set headers
-        $oOutput->set_header('Pragma: public');
-        $oOutput->set_header('Expires: 0');
-        $oOutput->set_header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        $oOutput->set_header('Cache-Control: public');
-        $oOutput->set_header('Content-Description: File Transfer');
-        $oOutput->set_header('Content-Type: text/calendar;charset=utf-8');
-        $oOutput->set_header('Content-Disposition: attachment; filename="' . $sFilename . '"');
-        $oOutput->set_header('Content-Transfer-Encoding: binary');
-        $oOutput->set_header('Content-Length: ' . strlen($sData));
-
-        //  Send file
-        $oOutput->set_output($sData);
+        /** @var \Nails\Common\Service\Output $oOutput */
+        $oOutput = Factory::servicesave('Output');
+        $oOutput
+            ->setHeader('Pragma: public')
+            ->setHeader('Expires: 0')
+            ->setHeader('Cache-Control: must-revalidate, post-check=0, pre-check=0')
+            ->setHeader('Cache-Control: public')
+            ->setHeader('Content-Description: File Transfer')
+            ->setHeader('Content-Type: text/calendar;charset=utf-8')
+            ->setHeader('Content-Disposition: attachment; filename="' . $sFilename . '"')
+            ->setHeader('Content-Transfer-Encoding: binary')
+            ->setHeader('Content-Length: ' . strlen($sData))
+            ->setOutput($sData)
     }
 
     // --------------------------------------------------------------------------

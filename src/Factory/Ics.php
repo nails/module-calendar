@@ -248,7 +248,7 @@ class Ics implements \JsonSerializable {
             ->setHeader('Content-Disposition: attachment; filename="' . $sFilename . '"')
             ->setHeader('Content-Transfer-Encoding: binary')
             ->setHeader('Content-Length: ' . strlen($sData))
-            ->setOutput($sData)
+            ->setOutput($sData);
     }
 
     // --------------------------------------------------------------------------

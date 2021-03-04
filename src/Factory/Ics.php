@@ -5,17 +5,26 @@ namespace Nails\Calendar\Factory;
 use Nails\Calendar\Exception\IcsException;
 use Nails\Factory;
 
-class Ics implements \JsonSerializable {
-
+/**
+ * Class Ics
+ *
+ * @package Nails\Calendar\Factory
+ */
+class Ics implements \JsonSerializable
+{
     /**
-     * @var array The data used to create the ICS
+     * The data used to create the ICS
+     *
+     * @var array
      */
     protected $aIcsData;
 
     // --------------------------------------------------------------------------
 
     /**
-     * @var array Any errors detected when isValid() is called
+     * Any errors detected when isValid() is called
+     *
+     * @var array
      */
     protected $aErrors;
 
@@ -38,12 +47,13 @@ class Ics implements \JsonSerializable {
 
     /**
      * Ics constructor.
+     *
      * @param array $aProperties Initial properties to set
      */
-    public function __construct($aProperties = array())
+    public function __construct($aProperties = [])
     {
         //  Set up the default property values
-        $this->aIcsData = array();
+        $this->aIcsData = [];
         foreach ($aProperties as $sProperty => $mValue) {
             $this->setProperty($sProperty, $mValue);
         }
@@ -58,11 +68,13 @@ class Ics implements \JsonSerializable {
 
     /**
      * Sets a property of the .ics file
-     * @param  $sProperty string The name of the property to set
-     * @param  $mValue    mixed  The value of the property
+     *
+     * @param string $sProperty The name of the property to set
+     * @param mixed  $mValue    The value of the property
+     *
      * @return $this
      */
-    protected function setProperty($sProperty, $mValue)
+    protected function setProperty($sProperty, $mValue): self
     {
         $this->aIcsData[$sProperty] = $mValue;
         return $this;
@@ -72,21 +84,26 @@ class Ics implements \JsonSerializable {
 
     /**
      * Retrieve a property value
-     * @param  $sProperty string The property to retrieve
+     *
+     * @param string $sProperty The property to retrieve
+     *
      * @return mixed|null
      */
-    protected function getProperty($sProperty)
+    protected function getProperty(string $sProperty)
     {
-        return isset($this->aIcsData[$sProperty]) ? $this->aIcsData[$sProperty] : null;
+        return isset($this->aIcsData[$sProperty])
+            ? $this->aIcsData[$sProperty]
+            : null;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Returns the class properties as an array
+     *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->aIcsData;
     }
@@ -96,16 +113,21 @@ class Ics implements \JsonSerializable {
     /**
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
 
     // --------------------------------------------------------------------------
 
-    public function isValid()
+    /**
+     * Whether the ICS data is valid
+     *
+     * @return bool
+     */
+    public function isValid(): bool
     {
-        $this->aErrors = array();
+        $this->aErrors = [];
 
         //  Summary is required
         if (empty($this->getSummary())) {
@@ -137,10 +159,11 @@ class Ics implements \JsonSerializable {
     /**
      * Returns the contents of the .ics file
      * Useful reading: https://tools.ietf.org/html/rfc2446#page-35
-     * @return string The file data
+     *
+     * @return string
      * @throws IcsException
      */
-    public function getData()
+    public function getData(): string
     {
         //  Validate
         if (!$this->isValid()) {
@@ -154,38 +177,38 @@ class Ics implements \JsonSerializable {
         $aAttendees = $this->getAttendees();
 
         //  Set the method
-        $sData  = "BEGIN:VCALENDAR\n";
-        $sData .= "VERSION:2.0\n";
-        $sData .= "PRODID:-//Nails//Calendar Module//EN";
-        $sData .= "CALSCALE:GREGORIAN\n";
-        $sData .= "BEGIN:VEVENT\n";
-        $sData .= "UID:{$this->getUid()}\n";
-        $sData .= "DTSTART:{$this->getStart(true)}\n";
-        $sData .= "DTEND:{$this->getEnd(true)}\n";
-        $sData .= "DTSTAMP:{$this->getStart(true)}\n";
+        $aData   = [];
+        $aData[] = 'BEGIN:VCALENDAR';
+        $aData[] = 'VERSION:2.0';
+        $aData[] = 'PRODID:-//Nails//Calendar Module//EN';
+        $aData[] = 'CALSCALE:GREGORIAN';
+        $aData[] = 'BEGIN:VEVENT';
+        $aData[] = 'UID:' . $this->getUid();
+        $aData[] = 'DTSTART:' . $this->getStart(true);
+        $aData[] = 'DTEND:' . $this->getEnd(true);
+        $aData[] = 'DTSTAMP:' . $this->getStart(true);
 
         if (!empty($oOrganiser)) {
-            $sData .= "ORGANIZER;CN=\"{$oOrganiser->name}\":mailto:{$oOrganiser->email}\n";
+            $aData[] = 'ORGANIZER;CN="' . $oOrganiser->name . '":mailto:' . $oOrganiser->email;
         }
 
         if (!empty($aAttendees)) {
-            foreach ($aAttendees as $oAttendee)
-            {
-                $sData .= "ATTENDEE;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN={$oAttendee->name};";
-                $sData .= "X-NUM-GUESTS=0:mailto:{$oAttendee->email}\n";
+            foreach ($aAttendees as $oAttendee) {
+                $aData[] = 'ATTENDEE;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=' . $oAttendee->name . ';';
+                $aData[] = 'X-NUM-GUESTS=0:mailto:' . $oAttendee->email;
             }
         }
 
-        $sData .= "DESCRIPTION:{$this->getDescription()}\n";
-        $sData .= "LAST-MODIFIED:{$this->getStart(true)}\n";
-        $sData .= "LOCATION:{$this->getLocation()}\n";
-        $sData .= "SUMMARY:{$this->getSummary()}\n";
-        $sData .= "SEQUENCE:0\n";
-        $sData .= "TRANSP:OPAQUE\n";
-        $sData .= "END:VEVENT\n";
-        $sData .= "END:VCALENDAR";
+        $aData[] = 'DESCRIPTION:' . $this->getDescription();
+        $aData[] = 'LAST-MODIFIED:' . $this->getStart(true);
+        $aData[] = 'LOCATION:' . $this->getLocation();
+        $aData[] = 'SUMMARY:' . $this->getSummary();
+        $aData[] = 'SEQUENCE:0';
+        $aData[] = 'TRANSP:OPAQUE';
+        $aData[] = 'END:VEVENT';
+        $aData[] = 'END:VCALENDAR';
 
-        return $sData;
+        return implode(PHP_EOL, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -193,11 +216,13 @@ class Ics implements \JsonSerializable {
 
     /**
      * Save the .ics file as a file on disk
-     * @param $sPath string The full path of the file to save
+     *
+     * @param string $sPath The full path of the file to save
+     *
      * @return bool
      * @throws IcsException
      */
-    public function save($sPath)
+    public function save(string $sPath): bool
     {
         $sData = $this->getData();
         $fh    = fopen($sPath, 'w+');
@@ -219,12 +244,14 @@ class Ics implements \JsonSerializable {
 
     /**
      * Streams the contents of the file to the browser
+     *
      * @param string $sFilename The name of the file to download
+     *
      * @return $this
      * @throws IcsException
      */
-    public function download($sFilename = 'invite.ics') {
-
+    public function download(string $sFilename = 'invite.ics'): self
+    {
         if (headers_sent()) {
             throw new IcsException(
                 'Headers already sent.',
@@ -255,10 +282,12 @@ class Ics implements \JsonSerializable {
 
     /**
      * Set the value of the "type" property
-     * @param $sValue string The value to set
-     * @return Ics
+     *
+     * @param string $sValue The value to set
+     *
+     * @return $this
      */
-    public function setType($sValue)
+    public function setType(string $sValue): self
     {
         return $this->setProperty('type', $sValue);
     }
@@ -267,9 +296,10 @@ class Ics implements \JsonSerializable {
 
     /**
      * Retrieve the value of the "type" property
+     *
      * @return string|null
      */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->getProperty('type');
     }
@@ -279,10 +309,12 @@ class Ics implements \JsonSerializable {
 
     /**
      * Set the "uid" property
-     * @param $sValue string The value to set
-     * @return Ics
+     *
+     * @param string $sValue The value to set
+     *
+     * @return $this
      */
-    public function setUid($sValue)
+    public function setUid(string $sValue): self
     {
         return $this->setProperty('uid', $sValue);
     }
@@ -291,9 +323,10 @@ class Ics implements \JsonSerializable {
 
     /**
      * Return the value of the "uid" property
-     * @return Ics
+     *
+     * @return string|null
      */
-    public function getUid()
+    public function getUid(): ?string
     {
         return $this->getProperty('uid');
     }
@@ -302,23 +335,26 @@ class Ics implements \JsonSerializable {
 
     /**
      * Set the "start" property
-     * @param $sValue string The value to set
-     * @return Ics
+     *
+     * @param string $sValue The value to set
+     *
+     * @return $this
      */
-    public function setStart($sValue)
+    public function setStart(string $sValue): self
     {
-        $oDate = new \DateTime($sValue);
-        return $this->setProperty('start', $oDate);
+        return $this->setProperty('start', new \DateTime($sValue));
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Return the value of the "start" property
-     * @param boolean $bAsString Whether to format the date as a string
-     * @return string|null
+     *
+     * @param bool $bAsString Whether to format the date as a string
+     *
+     * @return \DateTime|string|null
      */
-    public function getStart($bAsString = false)
+    public function getStart(bool $bAsString = false)
     {
         $oDate = $this->getProperty('start');
         if (!empty($oDate) && $bAsString) {
@@ -332,10 +368,12 @@ class Ics implements \JsonSerializable {
 
     /**
      * Set the "end" property
-     * @param $sValue string The value to set
-     * @return Ics
+     *
+     * @param string $sValue The value to set
+     *
+     * @return $this
      */
-    public function setEnd($sValue)
+    public function setEnd(string $sValue): self
     {
         $oDate = new \DateTime($sValue);
         return $this->setProperty('end', $oDate);
@@ -345,10 +383,12 @@ class Ics implements \JsonSerializable {
 
     /**
      * Return the value of the "end" property
-     * @param boolean $bAsString Whether to format the date as a string
-     * @return string|null
+     *
+     * @param bool $bAsString Whether to format the date as a string
+     *
+     * @return \DateTime|string|null
      */
-    public function getEnd($bAsString = false)
+    public function getEnd(bool $bAsString = false)
     {
         $oDate = $this->getProperty('end');
         if (!empty($oDate) && $bAsString) {
@@ -362,16 +402,18 @@ class Ics implements \JsonSerializable {
 
     /**
      * Set the "organiser" property
-     * @param $sName string The name of the organiser
-     * @param $sEmail string The email of the organiser
-     * @return Ics
+     *
+     * @param string $sName  The name of the organiser
+     * @param string $sEmail The email of the organiser
+     *
+     * @return $this
      */
-    public function setOrganiser($sName, $sEmail)
+    public function setOrganiser(string $sName, string $sEmail): self
     {
-        $oOrganiser = (object) array(
+        $oOrganiser = (object) [
             'name'  => trim($sName),
-            'email' => trim($sEmail)
-        );
+            'email' => trim($sEmail),
+        ];
 
         return $this->setProperty('organiser', $oOrganiser);
     }
@@ -380,9 +422,10 @@ class Ics implements \JsonSerializable {
 
     /**
      * Return the value of the "organiser" property
+     *
      * @return \stdClass|null
      */
-    public function getOrganiser()
+    public function getOrganiser(): ?\stdClass
     {
         return $this->getProperty('organiser');
     }
@@ -391,10 +434,12 @@ class Ics implements \JsonSerializable {
 
     /**
      * Set the "attendees" property
-     * @param $aValue array The value to set
-     * @return Ics
+     *
+     * @param array $aValue The value to set
+     *
+     * @return $this
      */
-    public function setAttendees($aValue)
+    public function setAttendees(array $aValue): self
     {
         return $this->setProperty('attendees', $aValue);
     }
@@ -403,9 +448,10 @@ class Ics implements \JsonSerializable {
 
     /**
      * Return the value of the "attendees" property
+     *
      * @return array|null
      */
-    public function getAttendees()
+    public function getAttendees(): ?array
     {
         return $this->getProperty('attendees');
     }
@@ -414,10 +460,12 @@ class Ics implements \JsonSerializable {
 
     /**
      * Set the "description" property
-     * @param $sValue string The value to set
-     * @return Ics
+     *
+     * @param string $sValue The value to set
+     *
+     * @return $this
      */
-    public function setDescription($sValue)
+    public function setDescription(string $sValue): self
     {
         return $this->setProperty('description', $sValue);
     }
@@ -426,9 +474,10 @@ class Ics implements \JsonSerializable {
 
     /**
      * Return the value of the "description" property
+     *
      * @return string|null
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->getProperty('description');
     }
@@ -437,10 +486,12 @@ class Ics implements \JsonSerializable {
 
     /**
      * Set the "location" property
-     * @param $sValue string The value to set
-     * @return Ics
+     *
+     * @param string $sValue The value to set
+     *
+     * @return $this
      */
-    public function setLocation($sValue)
+    public function setLocation($sValue): self
     {
         return $this->setProperty('location', $sValue);
     }
@@ -449,9 +500,10 @@ class Ics implements \JsonSerializable {
 
     /**
      * Return the value of the "location" property
+     *
      * @return string|null
      */
-    public function getLocation()
+    public function getLocation(): ?string
     {
         return $this->getProperty('location');
     }
@@ -460,10 +512,12 @@ class Ics implements \JsonSerializable {
 
     /**
      * Set the "summary" property
-     * @param $sValue string The value to set
-     * @return Ics
+     *
+     * @param string $sValue The value to set
+     *
+     * @return $this
      */
-    public function setSummary($sValue)
+    public function setSummary($sValue): self
     {
         return $this->setProperty('summary', $sValue);
     }
@@ -472,16 +526,23 @@ class Ics implements \JsonSerializable {
 
     /**
      * Return the value of the "summary" property
+     *
      * @return string|null
      */
-    public function getSummary()
+    public function getSummary(): ?string
     {
         return $this->getProperty('summary');
     }
 
     // --------------------------------------------------------------------------
 
-    public function addAttendee($sEmail, $sName = '')
+    /**
+     * @param string $sEmail The attendee's email
+     * @param string $sName  The attendee's name
+     *
+     * @return $this
+     */
+    public function addAttendee(string $sEmail, string $sName = ''): self
     {
         $sEmail = trim($sEmail);
         $sName  = trim($sName);
@@ -489,7 +550,7 @@ class Ics implements \JsonSerializable {
         //  Validate
         //  Valid email - @todo
 
-        $aAttendees = $this->getAttendees() ?: array();
+        $aAttendees = $this->getAttendees() ?: [];
 
         //  Add the attendee if they aren't already attending
         $bAttending = false;
@@ -501,10 +562,10 @@ class Ics implements \JsonSerializable {
         }
 
         if (!$bAttending) {
-            $aAttendees[] = (object) array(
+            $aAttendees[] = (object) [
                 'email' => $sEmail,
-                'name'  => $sName
-            );
+                'name'  => $sName,
+            ];
         }
 
         return $this->setAttendees($aAttendees);

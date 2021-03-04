@@ -12,6 +12,11 @@
 
 namespace Nails\Calendar\Exception;
 
+/**
+ * Class IcsException
+ *
+ * @package Nails\Calendar\Exception
+ */
 class IcsException extends CalendarException
 {
 }

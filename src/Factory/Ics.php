@@ -203,6 +203,9 @@ class Ics implements \JsonSerializable
         $aData[] = 'LAST-MODIFIED:' . $this->getStart(true);
         $aData[] = 'LOCATION:' . $this->getLocation();
         $aData[] = 'SUMMARY:' . $this->getSummary();
+        if (!empty($this->getUrl())) {
+            $aData[] = 'URL:' . str_replace([':', ',', ';'], ['\\:', '\\,', '\\;'], $this->getUrl());
+        }
         $aData[] = 'SEQUENCE:0';
         $aData[] = 'TRANSP:OPAQUE';
         $aData[] = 'END:VEVENT';
@@ -532,6 +535,32 @@ class Ics implements \JsonSerializable
     public function getSummary(): ?string
     {
         return $this->getProperty('summary');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the "url" property
+     *
+     * @param string $sValue The value to set
+     *
+     * @return $this
+     */
+    public function setUrl($sValue): self
+    {
+        return $this->setProperty('url', $sValue);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return the value of the "url" property
+     *
+     * @return string|null
+     */
+    public function getUrl(): ?string
+    {
+        return $this->getProperty('url');
     }
 
     // --------------------------------------------------------------------------

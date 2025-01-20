@@ -211,11 +211,19 @@ class Ics implements \JsonSerializable
         $aData[] = 'END:VEVENT';
         $aData[] = 'END:VCALENDAR';
 
+        $aData = array_map([$this, 'foldLine'], $aData);
+
         return implode(PHP_EOL, $aData);
     }
 
     // --------------------------------------------------------------------------
 
+    protected function foldLine(stirng $sLine): string
+    {
+        return wordwrap($line, 75, "\n ");
+    }
+
+    // --------------------------------------------------------------------------
 
     /**
      * Save the .ics file as a file on disk

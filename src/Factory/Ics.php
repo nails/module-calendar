@@ -218,7 +218,7 @@ class Ics implements \JsonSerializable
 
     // --------------------------------------------------------------------------
 
-    protected function foldLine(stirng $sLine): string
+    protected function foldLine(string $sLine): string
     {
         return wordwrap($line, 75, "\n ");
     }

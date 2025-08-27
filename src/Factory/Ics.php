@@ -204,7 +204,7 @@ class Ics implements \JsonSerializable
         $aData[] = 'LOCATION:' . $this->getLocation();
         $aData[] = 'SUMMARY:' . $this->getSummary();
         if (!empty($this->getUrl())) {
-            $aData[] = 'URL:' . str_replace([':', ',', ';'], ['\\:', '\\,', '\\;'], $this->getUrl());
+            $aData[] = 'URL:' . $this->getUrl();
         }
         $aData[] = 'SEQUENCE:0';
         $aData[] = 'TRANSP:OPAQUE';

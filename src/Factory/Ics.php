@@ -2,6 +2,7 @@
 
 namespace Nails\Calendar\Factory;
 
+use Nails\Calendar\Enum\Ics\Status;
 use Nails\Calendar\Exception\IcsException;
 use Nails\Factory;
 
@@ -206,6 +207,7 @@ class Ics implements \JsonSerializable
         if (!empty($this->getUrl())) {
             $aData[] = 'URL:' . $this->getUrl();
         }
+        $aData[] = 'STATUS:' . $this->getStatus()->value;
         $aData[] = 'SEQUENCE:0';
         $aData[] = 'TRANSP:OPAQUE';
         $aData[] = 'END:VEVENT';
@@ -596,6 +598,47 @@ class Ics implements \JsonSerializable
     public function getUrl(): ?string
     {
         return $this->getProperty('url');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the "status" property
+     *
+     * @param * @param string $sValue The value to set
+     * $sValue The value to set
+     *
+     * @return $this
+     */
+    public function setStatus(Status $sValue): self
+    {
+        return $this->setProperty('status', $sValue);
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function setConfirmed(Status $sValue): self
+    {
+        return $this->setStatus(Status::CONFIRMED);
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function setCancelled(Status $sValue): self
+    {
+        return $this->setStatus(Status::CONFIRMED);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return the value of the "status" property
+     *
+     * @return Status
+     */
+    public function getStatus(): ?Status
+    {
+        return $this->getProperty('status') ?? Status::CONFIRMED;
     }
 
     // --------------------------------------------------------------------------

@@ -220,7 +220,34 @@ class Ics implements \JsonSerializable
 
     protected function foldLine(string $sLine): string
     {
-        return wordwrap($sLine, 75, "\n ");
+        //  Normalise new lines
+        $sLine = str_replace("\r", "\n", $sLine);
+
+        //  Escape new lines
+        $sLine = str_replace("\n", '\\n', $sLine);
+
+        //  Wrap contents
+        $sLine = $this->wrap($sLine, 75, "\n ");
+
+        return $sLine;
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function wrap(string $sString, int $iWidth, string $sBreak = "\n", string $sEnc = 'UTF-8'): string
+    {
+        if ($iWidth <= 0 || $sBreak === '') {
+            return $sString;
+        }
+
+        $out = '';
+        $len = mb_strlen($sString, $sEnc);
+
+        for ($i = 0; $i < $len; $i += $iWidth) {
+            $chunk = mb_substr($sString, $i, $iWidth, $sEnc);
+            $out   .= ($i + $iWidth < $len) ? $chunk . $sBreak : $chunk;
+        }
+        return $out;
     }
 
     // --------------------------------------------------------------------------
